@@ -10,7 +10,7 @@ class Vector:
     def __init__(self, x, y, x1=0, y1=0):
         self.pos = np.array([x1, y1], dtype=float)
         self.vec = np.array([x, y], dtype=float)
-        self.__mag = self.mag()
+        self._mag = self.mag()
 
     def __str__(self):
         return f"<{self.vec[0]}, {self.vec[1]}>"
@@ -48,38 +48,32 @@ class Vector:
     def set_y0(self, y0):
         self.pos[1] = y0
 
-    def set_mag(self, num, ret=0):
-        if bool(ret):
-            return self.vec*num/self.mag()
-        else:
-            if self.mag() != 0:
-                self.vec = self.vec*num/self.mag()
-            self.__mag = num
+    def set_mag(self, num):
+        if self.mag() != 0:
+            self.vec = self.vec*num/self.mag()
+        self._mag = num
 
     def set_ang(self, angle):
-        self.vec = np.array([self.__mag, 0])
+        self.vec = np.array([self._mag, 0])
         self.rotate(angle)
 
     def rotate(self, angle):
-        rotation_matrix = [[np.cos(angle), np.sin(angle)], [-np.sin(angle), np.cos(angle)]]
+        rotation_matrix = [[cos(angle), sin(angle)], [-sin(angle), cos(angle)]]
         self.vec = np.dot(rotation_matrix, self.vec)
-        self.set_mag(self.__mag)
+        self.set_mag(self._mag)
 
     def mag(self):
         return lrg.norm(self.vec)
 
-    def dot(self, vec):
-        return np.vdot(self.vec, vec)
+    def dot(self, oth):
+        return np.vdot(self.vec, oth.vec)
 
-    def norm(self, ret=1):
-        if bool(ret):
-            return self.set_mag(1, ret)
-        else:
-            self.set_mag(1)
+    def norm(self):
+        self.set_mag(1)
 
     def mul(self, num):
         self.vec *= num
-        self.__mag = self.mag()
+        self._mag = self.mag()
 
     def ang(self):
         return -np.arctan2(*self.vec[::-1])
@@ -88,12 +82,16 @@ class Vector:
         return abs(self.ang()-oth.ang())
 
     def proj(self, oth):
-        return Vector(*self.dot(oth.norm())*oth.norm(), *self.pos)
+        vec = oth.norm()*self.dot(oth.norm())
+        return vec.set_pos(self.pos)
 
     def end_pos(self):
         return self.vec + self.pos
 
+    def copy(self):
+        return Vector(self.vec, self.pos)
 
+    # drawing part
 
     def draw(self, pd, r=1, col="red", arrow=0):
         if bool(arrow):
@@ -114,51 +112,126 @@ class Vector:
         p2 = vec_l+(-vec_s[1]*mul, vec_s[0]*mul)
         return self.pos+p1, self.pos+p2, self.end_pos()
 
+for _ in [1]:
+    def set_vec(obj, vec):
+        obj.vec = np.array(vec)
+        return obj
 
-pd = pyg_draw(0.5)
-w, h = pd.cen()
-clo = pd.clock
+    def set_pos(obj, pos):
+        obj.pos = np.array(pos)
+        return obj
 
-a = Vector(2, 2, w, h) * 50
-a2 = Vector(2, 2, w, h) * 50
+    def set_x(obj, x):
+        obj.vec[0] = x
+        return obj
 
-m = a.mag()
-m2 = a2.mag()
+    def set_y(obj, y):
+        obj.vec[1] = y
+        return obj
 
-#a.set_mag(1)
-#a.rotate(pi*0.5)
-#a.set_ang(pi)
+    def set_x0(obj, x0):
+        obj.pos[0] = x0
+        return obj
 
-ang = 0
+    def set_y0(obj, y0):
+        obj.pos[1] = y0
+        return obj
 
-run = True
-while run:
-    clo.tick(120)
+    def set_mag(obj, num):
+        if obj.mag() != 0:
+            obj.vec = obj.vec*num/obj.mag()
+        obj._mag = num
+        return obj
 
-    for event in pygame.event.get():
-        if event.type == KEYDOWN and event.key == K_ESCAPE:
-            run = not True
+    def set_ang(obj, angle):
+        obj.vec = np.array([obj._mag, 0])
+        obj.rotate(angle)
+        return obj
 
-    ang += 0.01
-    #print(a.mag(), a.ang())
-    a.set_ang(a.ang())
-    a.rotate(-pi*0.001)
-    print(a.ang_betw(a2))
+    def rotate(obj, angle):
+        rotation_matrix = [[cos(angle), sin(angle)], [-sin(angle), cos(angle)]]
+        obj.vec = np.dot(rotation_matrix, obj.vec)
+        obj.set_mag(obj._mag)
+        return obj
 
-    a.draw(pd, 4, arrow=1)
-    a2.draw(pd, 4, arrow=1)
+    def mag(obj):
+        return lrg.norm(obj.vec)
 
-    a3 = a.proj(a2)
-    a3.draw(pd, 4, arrow=1, col="lblue")
+    def dot(obj, oth):
+        return np.vdot(obj.vec, oth.vec)
 
-    a4 = a2.proj(a)
-    a4.draw(pd, 4, arrow=1, col="lblue")
+    def norm(obj):
+        obj.set_mag(1)
+        return obj
 
-    pd.line(a3.end_pos(), a.end_pos(), "green", 2)
-    pd.line(a4.end_pos(), a2.end_pos(), "green", 2)
+    def mul(obj, num):
+        obj.vec *= num
+        obj._mag = obj.mag()
+        return obj
 
-    #a.mul(1.0005)
+    def ang(obj):
+        return -np.arctan2(*obj.vec[::-1])
 
-    pd.upd()
-    pd.fill()
+    def ang_betw(obj, oth):
+        return abs(obj.ang()-oth.ang())
+
+    def proj(obj, oth):
+        vec = oth.norm()*obj.dot(oth.norm())
+        return vec.set_pos(obj.pos)
+
+    def end_pos(obj):
+        return obj.vec + obj.pos
+
+    def copy(obj):
+        return Vector(obj.vec, obj.pos)
+
+if __name__ == "__main__":
+
+    pd = pyg_draw(0.5)
+    w, h = pd.cen()
+    clo = pd.clock
+
+    a = Vector(2, 2, w, h) * 50
+    a2 = Vector(2, 2, w, h) * 50
+
+    m = a.mag()
+    m2 = a2.mag()
+
+    #a.set_mag(1)
+    #a.rotate(pi*0.5)
+    #a.set_ang(pi)
+
+    ang = 0
+
+    run = True
+    while run:
+        clo.tick(120)
+
+        for event in pygame.event.get():
+            if event.type == KEYDOWN and event.key == K_ESCAPE:
+                run = not True
+
+        ang += 0.01
+        #print(a.mag(), a.ang())
+        a.set_ang(a.ang())
+        a.rotate(-pi*0.001)
+        print(a.ang_betw(a2))
+
+        a.draw(pd, 4, arrow=1)
+        a2.draw(pd, 4, arrow=1)
+
+        
+        a3 = a.proj(a2)
+        a3.draw(pd, 4, arrow=1, col="lblue")
+
+        a4 = a2.proj(a)
+        a4.draw(pd, 4, arrow=1, col="lblue")
+
+        pd.line(a3.end_pos(), a.end_pos(), "green", 2)
+        pd.line(a4.end_pos(), a2.end_pos(), "green", 2)
+
+        #a.mul(1.0005)
+
+        pd.upd()
+        pd.fill()
 

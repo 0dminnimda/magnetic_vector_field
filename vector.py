@@ -30,27 +30,6 @@ class Vector:
     def __truediv__(self, num):
         return Vector(self.vec/num, *self.pos)
 
-    def rotate(self, angle):
-        rotation_matrix = [[np.cos(angle), np.sin(angle)], [-np.sin(angle), np.cos(angle)]]
-        self.vec = np.dot(rotation_matrix, self.vec)
-        self.set_mag(self.__mag)
-
-    def mag(self):
-        return lrg.norm(self.vec)
-
-    def norm(self):
-        self.set_mag(1)
-
-    def mul(self, num):
-        self.vec *= num
-        self.__mag = self.mag()
-
-    def ang(self):
-        return -np.arctan2(*self.vec[::-1])
-
-    def ang_between(self, vec):
-        return self.ang()-vec.ang()
-
     def set_vec(self, vec):
         self.vec = np.array(vec)
 
@@ -69,17 +48,71 @@ class Vector:
     def set_y0(self, y0):
         self.pos[1] = y0
 
-    def set_mag(self, num):
-        if self.mag() != 0:
-            self.vec = self.vec*num/self.mag()
-        self.__mag = num
+    def set_mag(self, num, ret=0):
+        if bool(ret):
+            return self.vec*num/self.mag()
+        else:
+            if self.mag() != 0:
+                self.vec = self.vec*num/self.mag()
+            self.__mag = num
 
     def set_ang(self, angle):
         self.vec = np.array([self.__mag, 0])
         self.rotate(angle)
 
-    def draw(self, pd, r=1, col="red"):
-        pd.line(self.pos, self.vec+self.pos, col, r)
+    def rotate(self, angle):
+        rotation_matrix = [[np.cos(angle), np.sin(angle)], [-np.sin(angle), np.cos(angle)]]
+        self.vec = np.dot(rotation_matrix, self.vec)
+        self.set_mag(self.__mag)
+
+    def mag(self):
+        return lrg.norm(self.vec)
+
+    def dot(self, vec):
+        return np.vdot(self.vec, vec)
+
+    def norm(self, ret=1):
+        if bool(ret):
+            return self.set_mag(1, ret)
+        else:
+            self.set_mag(1)
+
+    def mul(self, num):
+        self.vec *= num
+        self.__mag = self.mag()
+
+    def ang(self):
+        return -np.arctan2(*self.vec[::-1])
+
+    def ang_betw(self, oth):
+        return abs(self.ang()-oth.ang())
+
+    def proj(self, oth):
+        return Vector(*self.dot(oth.norm())*oth.norm(), *self.pos)
+
+    def end_pos(self):
+        return self.vec + self.pos
+
+
+
+    def draw(self, pd, r=1, col="red", arrow=0):
+        if bool(arrow):
+            pts = self.arrow_pts()
+            pd.line(self.pos, sum(pts)/3, col, r)
+            pd.poly(pts, col)
+        else:
+            pd.line(self.pos, self.vec+self.pos, col, r)
+
+    def draw_arrow(self, pd):
+        pd.poly(self.arrow_pts())
+        
+    def arrow_pts(self, rat=0.15, mul=0.4):
+        vec = self.vec
+        vec_s = vec*rat
+        vec_l = vec-vec_s
+        p1 = vec_l+(vec_s[1]*mul, -vec_s[0]*mul)
+        p2 = vec_l+(-vec_s[1]*mul, vec_s[0]*mul)
+        return self.pos+p1, self.pos+p2, self.end_pos()
 
 
 pd = pyg_draw(0.5)
@@ -107,11 +140,23 @@ while run:
             run = not True
 
     ang += 0.01
-    print(a.mag(), a.ang())
-    a.draw(pd, 4)
+    #print(a.mag(), a.ang())
     a.set_ang(a.ang())
     a.rotate(-pi*0.001)
-    
+    print(a.ang_betw(a2))
+
+    a.draw(pd, 4, arrow=1)
+    a2.draw(pd, 4, arrow=1)
+
+    a3 = a.proj(a2)
+    a3.draw(pd, 4, arrow=1, col="lblue")
+
+    a4 = a2.proj(a)
+    a4.draw(pd, 4, arrow=1, col="lblue")
+
+    pd.line(a3.end_pos(), a.end_pos(), "green", 2)
+    pd.line(a4.end_pos(), a2.end_pos(), "green", 2)
+
     #a.mul(1.0005)
 
     pd.upd()

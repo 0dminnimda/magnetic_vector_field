@@ -46,7 +46,7 @@ class pyg_draw():
 
     def cen(self, a=2, b=2):
         return (self.scr[0]/a, self.scr[1]/b)
-        
+
     def circ(self, pos, rad=1, col="white", wid=0):
         if pos[0] != None:
             col = self.col(col)
@@ -55,7 +55,7 @@ class pyg_draw():
             try:
                 pygame.draw.circle(self.sur, col, (int(pos[0]), int(pos[1])), int(rad), (wid))
             except Exception: pass
-        
+
     def line(self, pos1, pos2, col="white", wid=1, aa=0, blend=1):
         """
         first position, second position, color, width, aa, blend
@@ -74,25 +74,25 @@ class pyg_draw():
         try:
             pygame.draw.polygon(self.sur, col, pos_s, 0)
         except Exception: pass
-        
+
     def rect(self, arr, col="white", wid=0):
         col = self.col(col)
         try:
             pygame.draw.rect(self.sur, col, arr, wid)
         except Exception: pass
-        
+
     def elip(self, rec, col="white", wid=1):
         col = self.col(col)
         try:
             pygame.draw.ellipse(self.sur, col, rec, wid)
         except Exception: pass
-    
+
     def arc(self, rec, sa, ea, col="white", wid=1):
         col = self.col(col)
         try:
             pygame.draw.arc(self.sur, col, rec, sa, ea, wid)
         except Exception: pass
-        
+
     def font_init(self, font_size, num_symol, col="white", rect_wid=1, txt_font="arial", rect=1):
         col = self.col(col)
         font = pygame.font.SysFont(txt_font, font_size)
@@ -118,17 +118,17 @@ class pyg_draw():
 
     def blit(self, sur2, pos):
         self.sur.blit(sur2, pos)
-        
+
     def fill(self, col="black"):
         if isinstance(col, str) is True:
             col = self.col(col)
         self.sur.fill(col)
         self.wind.fill(col)
-        
+
     def upd(self):
         self.wind.blit(self.sur, (0, 0))
         pygame.display.flip()
-        
+
     def ret(self):
         return self.sur
 
@@ -139,8 +139,8 @@ class pyg_draw():
                 return True
             elif event.type == KEYDOWN and event.key == K_ESCAPE:
                 return False
-                
-                
+
+
 class Grid():
     def __init__(self, pd, num, off=0.1, rame=0, came=0):
         self.pd = pd
@@ -170,15 +170,15 @@ class Grid():
             0:"black",
             2:"gray",
             }
-        
+
     def colo(self, color):
         if isinstance(color, int) is True:
             return self.colors.get(color)
-        
+
         elif isinstance(color, float) is True:
             color *= 1000
             return (color, color, color)#self.pd.col(list(map(int,(color, color, color)))), 2''
-        
+
     def draw(self, grid, xo=0, yo=0, wid=0):
         #row, col = self.row, self.col
         row, col = len(grid), len(grid[0])
@@ -186,16 +186,16 @@ class Grid():
         mx, my = self.mx, self.my
         fx, fy = x-mx, y-my
         for i in range(row):
-                for j in range(col):
-                    color = self.colo(grid[i][j])
-                    p1 = x*i+mx/2  +xo
-                    p2 = y*j+my/2  +yo
-                    self.pd.rect(color, [p1, p2, fx, fy], wid)
-                    
+            for j in range(col):
+                color = self.colo(grid[i][j])
+                p1 = x*i+mx/2  +xo
+                p2 = y*j+my/2  +yo
+                self.pd.rect(color, [p1, p2, fx, fy], wid)
+
 class mou_pos():
     def __init__(self, pd):
         self.scr = pd.scr
-        
+
     def mpos(self, val=1, cent=1):
         x, y = pygame.mouse.get_pos()
         if cent == 1:
@@ -208,4 +208,3 @@ class mou_pos():
 
     def mang(self, *arg):
         return ma.atan2(*self.mpos(*arg)[::-1])
-                    

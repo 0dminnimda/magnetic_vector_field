@@ -78,8 +78,7 @@ class Vector:
         return abs(self.ang()-oth.ang())
 
     def proj(self, oth):
-        vec = oth.norm()*self.dot(oth.norm())
-        return vec.set_pos(self.pos)
+        return proj(self, oth)
 
     def end_pos(self):
         return self.vec + self.pos
@@ -222,7 +221,7 @@ if __name__ == "__main__":
         a.draw(pd, 4, arrow=1)
         a2.draw(pd, 4, arrow=1)
 
-        a3 = proj(a, a2)
+        a3 = a.proj(a2)
         a3.draw(pd, 4, arrow=1, col="lblue")
 
         a4 = proj(a2, a)

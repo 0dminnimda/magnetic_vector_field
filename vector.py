@@ -88,16 +88,16 @@ class Vector:
 
     # drawing part
 
-    def draw(self, pd, r=1, col="red", arrow=0):
+    def draw(self, pd, r=1, col="red", arrow=0, rat=0.15, mul=0.4):
         if bool(arrow):
-            pts = self.arrow_pts()
+            pts = self.arrow_pts(rat, mul)
             pd.line(self.pos, sum(pts)/3, col, r)
             pd.poly(pts, col)
         else:
             pd.line(self.pos, self.vec+self.pos, col, r)
 
-    def draw_arrow(self, pd):
-        pd.poly(self.arrow_pts())
+    def draw_arrow(self, pd, rat=0.15, mul=0.4):
+        pd.poly(self.arrow_pts(rat, mul))
         
     def arrow_pts(self, rat=0.15, mul=0.4):
         vec = self.vec
@@ -144,8 +144,8 @@ for _ in [1]:
         return obj
 
     def rotate(obj, angle):
-        rotation_matrix = [[cos(angle), sin(angle)], [-sin(angle), cos(angle)]]
-        obj.vec = np.dot(rotation_matrix, obj.vec)
+        #rotation_matrix = 
+        obj.vec = np.dot([[cos(angle), sin(angle)], [-sin(angle), cos(angle)]], obj.vec)
         obj.set_mag(obj._mag)
         return obj
 

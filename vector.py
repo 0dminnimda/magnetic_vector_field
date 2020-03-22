@@ -175,6 +175,10 @@ for _ in [1]:
         v = dot(obj, norm(oth))*norm(oth).vec
         return Vector(*v, *oth.pos)
 
+    def comp(obj, oth):
+        oth = oth.copy()
+        return dot(obj, norm(oth))
+
     def end_pos(obj):
         return obj.vec + obj.pos
 

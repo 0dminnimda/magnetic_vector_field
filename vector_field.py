@@ -1,11 +1,10 @@
-import numpy as np
-from math import sin, cos, pi, tau, atan2
+#import numpy as np
+#from math import sin, cos, pi, tau, atan2
 import pygame
 from pygame.locals import *
 from pygame_draw import pyg_draw, mou_pos
 from time import time as ti
 from vector import *
-#from VectorFuncs import *
 
 pd = pyg_draw(0.5)
 w, h = pd.cen()

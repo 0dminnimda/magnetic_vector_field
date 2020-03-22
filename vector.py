@@ -1,10 +1,6 @@
 import numpy as np
 from numpy import linalg as lrg
 from math import sin, cos, pi, tau, atan2
-import pygame
-from pygame.locals import *
-from pygame_draw import pyg_draw, mou_pos
-from time import time as ti
 
 class Vector:
     def __init__(self, x, y, x1=0, y1=0):
@@ -89,7 +85,7 @@ class Vector:
         return self.vec + self.pos
 
     def copy(self):
-        return Vector(self.vec, self.pos)
+        return Vector(*self.vec, *self.pos)
 
     # drawing part
 
@@ -157,6 +153,12 @@ for _ in [1]:
     def mag(obj):
         return lrg.norm(obj.vec)
 
+    def ang(obj):
+        return -np.arctan2(*obj.vec[::-1])
+
+    def ang_betw(obj, oth):
+        return abs(obj.ang()-oth.ang())
+
     def dot(obj, oth):
         return np.vdot(obj.vec, oth.vec)
 
@@ -169,23 +171,23 @@ for _ in [1]:
         obj._mag = obj.mag()
         return obj
 
-    def ang(obj):
-        return -np.arctan2(*obj.vec[::-1])
-
-    def ang_betw(obj, oth):
-        return abs(obj.ang()-oth.ang())
-
     def proj(obj, oth):
-        vec = oth.norm()*obj.dot(oth.norm())
-        return vec.set_pos(obj.pos)
+        oth = oth.copy()
+        v = dot(obj, norm(oth))*norm(oth).vec
+        return Vector(*v, *oth.pos)
 
     def end_pos(obj):
         return obj.vec + obj.pos
 
     def copy(obj):
-        return Vector(obj.vec, obj.pos)
+        return Vector(*obj.vec, *obj.pos)
 
 if __name__ == "__main__":
+
+    import pygame
+    from pygame.locals import *
+    from pygame_draw import pyg_draw, mou_pos
+    from time import time as ti
 
     pd = pyg_draw(0.5)
     w, h = pd.cen()
@@ -220,11 +222,10 @@ if __name__ == "__main__":
         a.draw(pd, 4, arrow=1)
         a2.draw(pd, 4, arrow=1)
 
-        
-        a3 = a.proj(a2)
+        a3 = proj(a, a2)
         a3.draw(pd, 4, arrow=1, col="lblue")
 
-        a4 = a2.proj(a)
+        a4 = proj(a2, a)
         a4.draw(pd, 4, arrow=1, col="lblue")
 
         pd.line(a3.end_pos(), a.end_pos(), "green", 2)

@@ -74,8 +74,11 @@ class Vector:
     def ang(self):
         return -np.arctan2(*self.vec[::-1])
 
+    def angy(self):
+        return -np.arctan2(*self.vec)%tau-pi
+
     def ang_betw(self, oth):
-        return abs(self.ang()-oth.ang())
+        return -(abs((self.ang()-oth.ang())%tau-pi)-pi)
 
     def proj(self, oth):
         return proj(self, oth)
@@ -155,8 +158,11 @@ for _ in [1]:
     def ang(obj):
         return -np.arctan2(*obj.vec[::-1])
 
+    def angy(obj):
+        return -np.arctan2(*obj.vec)%tau-pi
+
     def ang_betw(obj, oth):
-        return abs(obj.ang()-oth.ang())
+        return -(abs((obj.ang()-oth.ang())%tau-pi)-pi)
 
     def dot(obj, oth):
         return np.vdot(obj.vec, oth.vec)
@@ -204,7 +210,8 @@ if __name__ == "__main__":
 
     #a.set_mag(1)
     #a.rotate(pi*0.5)
-    #a.set_ang(pi)
+    a2.set_ang(pi*0.5)
+    print(a2.angy())
 
     ang = 0
 
@@ -220,6 +227,7 @@ if __name__ == "__main__":
         #print(a.mag(), a.ang())
         a.set_ang(a.ang())
         a.rotate(-pi*0.001)
+        #print(a.angy(), a.ang())
         print(a.ang_betw(a2))
 
         a.draw(pd, 4, arrow=1)

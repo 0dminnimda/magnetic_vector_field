@@ -33,7 +33,9 @@ for i in range(len(rows)):
     for j in range(len(cols)):
         arr[i].append(mul(norm(set_ang(Vector(*rd(2), cols[j], rows[i]), 0)), 25))
         # prop(col*row, pi, i+j)
-        set_ang(arr[i][j], Vector(cols[j]-w, rows[i]-h).ang()+pi)
+        set_ang(arr[i][j], (Vector(cols[j]-w-120, rows[i]-h).ang() + Vector(cols[j]-w+120, rows[i]-h).ang() + pi)/2)
+
+#pt_rot(arr)
 
 #arr = [mul(norm(set_ang(Vector(*rd(2), w, h), rd())), 50) for i in range(30)]
 

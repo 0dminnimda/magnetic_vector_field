@@ -12,7 +12,7 @@ class Vector:
         return f"<{self.vec[0]}, {self.vec[1]}>"
         
     def __repr__(self):
-        return se.__str__()
+        return self.__str__()
 
     def __add__(self, oth):
         return Vector(*self.vec+oth.vec, *self.pos)
@@ -227,7 +227,7 @@ if __name__ == "__main__":
         #print(a.mag(), a.ang())
         a.set_ang(a.ang())
         a.rotate(-pi*0.001)
-        #print(a.angy(), a.ang())
+        print(a.angy(), a.ang())
         print(a.ang_betw(a2))
 
         a.draw(pd, 4, arrow=1)

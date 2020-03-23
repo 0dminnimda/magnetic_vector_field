@@ -11,10 +11,31 @@ def prop(max1, max2, val1):
     val2 = max2*val1/max1
     return val2
 
-def pt_rot(arr, pt):
-    for ar, i in zip(arr, cols):
-        for r, j in zip(ar, rows):
-            set_ang(r, Vector(i-pt[0], j-pt[1]).ang())
+def pt_rot(arr, pt, func):
+    global cols, rows
+    a=0
+    for obb, i in zip(arr, rows):
+        for ob, j in zip(obb, cols):
+            a += 1
+            func(ob, i, j, pt)#set_ang(r, Vector(i-pt[0], j-pt[1]).ang())
+
+def trans(ob, i, j, pt):
+    v = Vector(i-pt[1], j-pt[0])
+    r = v.mag()
+    theta = angy(v)
+    #print(f"{theta=},\n {v=}")
+    phi = 0
+    B = Bv(theta, phi, r)
+    set_ang(ob, Vector(B[0], B[-1]).ang())
+
+def Bv(theta, phi, r, mu=1):
+    xh = np.array([1, 0, 0])
+    yh = np.array([0, 1, 0])
+    zh = np.array([0, 0, 1])
+    vec = (sin(theta)*cos(theta)*
+           (cos(phi)*xh + sin(phi)*yh) 
+        + (cos(theta)**2 - 1/3)*zh)
+    return 3*mu/r**3 * vec
 
 pd = pyg_draw(0.75)
 w, h = pd.cen()
@@ -23,7 +44,7 @@ clo = pd.clock
 def rd(num=1):
     return tau*np.random.random_sample((num))-pi
 
-row, col = 30, 30
+row, col = 21, 20
 
 arr = []
 rows = np.linspace(25, 2*h-25, row)
@@ -33,9 +54,11 @@ for i in range(len(rows)):
     for j in range(len(cols)):
         arr[i].append(mul(norm(set_ang(Vector(*rd(2), cols[j], rows[i]), 0)), 25))
         # prop(col*row, pi, i+j)
-        set_ang(arr[i][j], (Vector(cols[j]-w-120, rows[i]-h).ang() + Vector(cols[j]-w+120, rows[i]-h).ang() + pi)/2)
+        #set_ang(arr[i][j], (Vector(cols[j]-w-120, rows[i]-h).ang() + Vector(cols[j]-w+120, rows[i]-h).ang() + pi)/2)
 
 #pt_rot(arr)
+
+pt_rot(arr, (w, h), trans)
 
 #arr = [mul(norm(set_ang(Vector(*rd(2), w, h), rd())), 50) for i in range(30)]
 

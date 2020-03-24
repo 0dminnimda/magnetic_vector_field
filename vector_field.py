@@ -6,7 +6,7 @@ from pygame_draw import pyg_draw, mou_pos
 from time import time as ti
 from vector import *
 
-vec = Vector
+Vec = Vector
 
 def prop(max1, max2, val1):
     val2 = max2*val1/max1
@@ -40,6 +40,7 @@ def B_diopole(i, j, pt):
     B = diopole(theta, phi, r) 
     return Vector(B[0], B[-1])
 
+'''
 def B_poles(i, j, pt):
     pt1, pt2 = pt
     v1 = Vector(i-pt1[1], j-pt1[0], *pt2)
@@ -53,7 +54,7 @@ def B_poles(i, j, pt):
     r1 = v1.mag()
     r2 = v2.mag()
     B = pole(r1, r2) 
-    return Vector(0, 0)#B[0], B[-1])
+    return Vector(0, 0)#B[0], B[-1])'''
 
 def B_poles(i, j, pt):
     p = (j, i)
@@ -65,10 +66,9 @@ def B_poles(i, j, pt):
     r1 = [p, pt1]
     r2 = [p, pt2]
 
-    rv = vec(r)
-    r1v = vec(r)
-    r2v = vec(r)
-    print()
+    rv = Vec(*to_pt(r)).mag()
+    r1v = Vec(*to_pt(r1)).mag()
+    r2v = Vec(*to_pt(r2)).mag()
 
     l = [pt1, pt2]
     lx = [(pt1[0], pt2[1]), pt2]
@@ -80,12 +80,21 @@ def B_poles(i, j, pt):
 
     # x1 > x > x2
 
+    xv = Vec(*to_pt(x)).mag()
+    x1v = Vec(*to_pt(x1)).mag()
+    x2v = Vec(*to_pt(x2)).mag()
+
     y = [cen, (cen[0], p[1])]
-    y1 = [pt2, (pt2[0], p[1])]
-    y2 = [pt1, (pt1[0], p[1])]
+    y1 = [pt1, (pt1[0], p[1])]
+    y2 = [pt2, (pt2[0], p[1])]
 
     # y1 > y > y2
 
+    yv = Vec(*to_pt(y)).mag()
+    y1v = Vec(*to_pt(y1)).mag()
+    y2v = Vec(*to_pt(y2)).mag()
+
+    '''
     pd.circ(p, 3)
     pd.line(*r1, col="purple")
     pd.line(*r2, col="lblue")
@@ -101,10 +110,17 @@ def B_poles(i, j, pt):
     pd.line(*y, col="red", wid=5)
     pd.line(*y1, col="red", wid=5)
     pd.line(*y2, col="red", wid=5)
+    '''
 
-    #B = pole(r1, r2, x1, x2, y1, y2)
+    B = pole(r1v, r2v, x1v, x2v, y1v, y2v, 10**-3)
 
-    return Vector(0, 0)
+    ve = Vec(*B)
+    
+    #ve.draw(pd, 1, arrow=1)
+
+    print(ve.ang())
+
+    return ve
 
 def to_pt(l):
     return *l[0], *l[1]
@@ -117,11 +133,11 @@ def diopole(theta, phi, r, mu=1):
            + (cos(theta)**2 - 1/3)*zh)
     return 3*mu/r**3 * vec
 
-def pole(r1, r2, x1, x2, y1, y2):
-    xh = np.array([1, 0, 0])
-    yh = np.array([0, 1, 0])
-    vec = (Baxis(r1, r2, x1, x2)*xh
-           + Baxis(r1, r2, y1, y2)*yh)
+def pole(r1, r2, x1, x2, y1, y2, b=1):
+    xh = np.array([1, 0])
+    yh = np.array([0, 1])
+    vec = (Baxis(r1, r2, x1, x2, b, -b)*xh
+           + Baxis(r1, r2, y1, y2, b, -b)*yh)
     return vec
 
 def Baxis(r1, r2, dist1, dist2, b1=1, b2=-1):
@@ -135,7 +151,7 @@ clo = pd.clock
 def rd(num=1):
     return tau*np.random.random_sample((num))-pi
 
-sc = 1/16
+sc = 2#1/16
 row, col = int(sc*801*0.01)+1, int(sc*1540*0.01)+1 # heigth, width
 print(f"{row=}, {col=}")
 
@@ -151,9 +167,9 @@ for i in range(len(rows)):
 
 #pt_rot(arr)
 
-pts = [(w+100, h-100), (w-100, h+100)]
+pts = [(w+1, h-1), (w-1, h+1)]
 
-pt_rot(arr, pts, trans)
+pt_rot(arr, pts, trans2)
 
 #arr = [mul(norm(set_ang(Vector(*rd(2), w, h), rd())), 50) for i in range(30)]
 
@@ -170,8 +186,8 @@ while run:
     for i in arr:
         for j in i:
             #rotate(j, a)
-            #j.draw(pd, 1, arrow=1, rat=0.4, mul=0.3, col=(127, 255, 255))
+            j.draw(pd, 1, arrow=1, rat=0.4, mul=0.3, col=(127, 255, 255))
             pass
 
     pd.upd()
-    #pd.fill()
+    pd.fill()

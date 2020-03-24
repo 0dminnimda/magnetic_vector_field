@@ -19,21 +19,20 @@ def pt_rot(arr, pt, func):
             a += 1
             func(ob, i, j, pt)
 
+def trans(ob, i, j, pt):
+    a = Bvec(i, j, (pt[0], pt[1]-1))
+    b = Bvec(i, j, (pt[0], pt[1]+1))
+    rotate(a, pi)
+    set_ang(ob, (a+b*1).ang())
+    # set_mag(ob, Bv.mag()*10**6.25)
+
 def Bvec(i, j, pt):
     v = Vector(i-pt[1], j-pt[0])
     r = v.mag()
     theta = angy(v)
-    phi = 0
+    phi = pi*0.45
     B = diopole(theta, phi, r) 
     return Vector(B[0], B[-1])
-
-def trans(ob, i, j, pt):
-    a = Bvec(i, j, (pt[0], pt[1]-120))
-    b = Bvec(i, j, (pt[0], pt[1]+120))
-    rotate(a, pi)
-    set_ang(ob, (a+b).ang())
-    # set_mag(ob, Bv.mag()*10**6.25)
-
 
 def diopole(theta, phi, r, mu=1):
     xh = np.array([1, 0, 0])
@@ -50,7 +49,9 @@ clo = pd.clock
 def rd(num=1):
     return tau*np.random.random_sample((num))-pi
 
-row, col = 24, 35
+sc = 2
+row, col = int(sc*801*0.01)+1, int(sc*1540*0.01)+1 # heigth, width
+print(f"{row=}, {col=}")
 
 arr = []
 rows = np.linspace(25, 2*h-25, row)

@@ -17,24 +17,30 @@ def pt_rot(arr, pt, func):
     for obb, i in zip(arr, rows):
         for ob, j in zip(obb, cols):
             a += 1
-            func(ob, i, j, pt)#set_ang(r, Vector(i-pt[0], j-pt[1]).ang())
+            func(ob, i, j, pt)
 
-def trans(ob, i, j, pt):
+def Bvec(i, j, pt):
     v = Vector(i-pt[1], j-pt[0])
     r = v.mag()
     theta = angy(v)
-    #print(f"{theta=},\n {v=}")
     phi = 0
-    B = Bv(theta, phi, r)
-    set_ang(ob, Vector(B[0], B[-1]).ang())
+    B = diopole(theta, phi, r) 
+    return Vector(B[0], B[-1])
 
-def Bv(theta, phi, r, mu=1):
+def trans(ob, i, j, pt):
+    a = Bvec(i, j, (pt[0], pt[1]-120))
+    b = Bvec(i, j, (pt[0], pt[1]+120))
+    #set_ang(ob, a.ang()-pi)
+    set_ang(ob, (a.ang() + b.ang()))
+    # set_mag(ob, Bv.mag()*10**6.25)
+
+
+def diopole(theta, phi, r, mu=1):
     xh = np.array([1, 0, 0])
     yh = np.array([0, 1, 0])
     zh = np.array([0, 0, 1])
-    vec = (sin(theta)*cos(theta)*
-           (cos(phi)*xh + sin(phi)*yh) 
-        + (cos(theta)**2 - 1/3)*zh)
+    vec = (sin(theta)*cos(theta)*(cos(phi)*xh + sin(phi)*yh)
+           + (cos(theta)**2 - 1/3)*zh)
     return 3*mu/r**3 * vec
 
 pd = pyg_draw(0.75)
@@ -44,7 +50,7 @@ clo = pd.clock
 def rd(num=1):
     return tau*np.random.random_sample((num))-pi
 
-row, col = 21, 20
+row, col = 24, 35
 
 arr = []
 rows = np.linspace(25, 2*h-25, row)

@@ -19,26 +19,17 @@ def pt_rot(arr, pts, func):
             a += 1
             func(ob, i, j, pts)
 
-def trans(ob, i, j, pts):
+def trans2(ob, i, j, pts):
     vcs = [B_diopole(i, j, pt) for pt in pts]
     vcs[0].rotate(pi)
     bv = vec_sum(vcs)
     set_ang(ob, bv.ang())
     #set_mag(ob, bv.mag()*10**6.25)
 
-def trans2(ob, i, j, pts):
-    bv = Bvec(i, j, pts)
-    #bv = vec_sum(vcs)
+def trans(ob, i, j, pts):
+    bv = B_poles(i, j, pts)
     set_ang(ob, bv.ang())
     #set_mag(ob, bv.mag()*10**6.25)
-
-def B_poles(i, j, pt):
-    v = Vector(i-pt[1], j-pt[0])
-    r = v.mag()
-    theta = angy(v)
-    phi = 0
-    B = diopole(theta, phi, r) 
-    return Vector(B[0], B[-1])
 
 def B_diopole(i, j, pt):
     v = Vector(i-pt[1], j-pt[0])
@@ -48,8 +39,64 @@ def B_diopole(i, j, pt):
     B = diopole(theta, phi, r) 
     return Vector(B[0], B[-1])
 
-def Baxis(theta, r, mu=1):
-    return mu*(3*cos(theta)**2 - 1) / r**3
+def B_poles(i, j, pt):
+    pt1, pt2 = pt
+    v1 = Vector(i-pt1[1], j-pt1[0], *pt2)
+    v2 = Vector(i-pt2[1], j-pt2[0], 500, 400)
+    v = Vector(i ,j, y1=600)
+    v1.rotate(-pi*0.5)
+    v1.draw(pd, 1, arrow=1)#, rat=0.4, mul=0.3)
+    pd.circ(pt1)
+    pd.circ(pt2)
+    #v2.draw(pd, 1, arrow=1)#, rat=0.4, mul=0.3)
+    r1 = v1.mag()
+    r2 = v2.mag()
+    B = pole(r1, r2) 
+    return Vector(0, 0)#B[0], B[-1])
+
+def B_poles(i, j, pt):
+    p = (j, i)
+    pt1 = pt[0]
+    pt2 = pt[1]
+    cen = (np.array(pt1)+np.array(pt2))/2
+
+    r = [p, cen]
+    r1 = [p, pt1]
+    r2 = [p, pt2]
+
+    l = [pt1, pt2]
+    lx = [(pt1[0], pt2[1]), pt2]
+    ly = [(pt1[0], pt2[1]), pt1]
+
+    x = [cen, (p[0], cen[1])]
+    x1 = [pt1, (p[0], pt1[1])]
+    x2 = [pt2, (p[0], pt2[1])]
+
+    # x1 > x > x2
+
+    y = [cen, (cen[0], p[1])]
+    y1 = [pt2, (pt2[0], p[1])]
+    y2 = [pt1, (pt1[0], p[1])]
+
+    # y1 > y > y2
+
+    pd.circ(p, 3)
+    pd.line(*r1, col="purple")
+    pd.line(*r2, col="lblue")
+    pd.line(*r, col="yellow", wid=3)
+    pd.line(*l, col="green", wid=5)
+    pd.line(*lx, col="green", wid=5)
+    pd.line(*ly, col="green", wid=5)
+
+    pd.line(*x, col="red", wid=5)
+    pd.line(*x1, col="red", wid=5)
+    pd.line(*x2, col="red", wid=5)
+
+    pd.line(*y, col="red", wid=5)
+    pd.line(*y1, col="red", wid=5)
+    pd.line(*y2, col="red", wid=5)
+
+    return Vector(0, 0)
 
 def diopole(theta, phi, r, mu=1):
     xh = np.array([1, 0, 0])
@@ -59,10 +106,14 @@ def diopole(theta, phi, r, mu=1):
            + (cos(theta)**2 - 1/3)*zh)
     return 3*mu/r**3 * vec
 
-def pole(theta, phi, r, mu=1):
+def pole(r, mu=1):
     xh = np.array([1, 0, 0])
     yh = np.array([0, 1, 0])
-    vec = (Baxis()*xh + Baxis()*yh)
+    #vec = (Baxis()*xh + Baxis()*yh)
+
+def Baxis(r1, r2, dist1, dist2, b1=1, b2=-1):
+    return (b1*dist1/r1**3
+            + b2*dist2/r2**3)
 
 pd = pyg_draw(0.75)
 w, h = pd.cen()
@@ -71,7 +122,7 @@ clo = pd.clock
 def rd(num=1):
     return tau*np.random.random_sample((num))-pi
 
-sc = 2
+sc = 1/16
 row, col = int(sc*801*0.01)+1, int(sc*1540*0.01)+1 # heigth, width
 print(f"{row=}, {col=}")
 
@@ -87,7 +138,7 @@ for i in range(len(rows)):
 
 #pt_rot(arr)
 
-pts = [(w-100, h-100), (w+100, h+100)]
+pts = [(w+100, h-100), (w-100, h+100)]
 
 pt_rot(arr, pts, trans)
 
@@ -106,7 +157,8 @@ while run:
     for i in arr:
         for j in i:
             #rotate(j, a)
-            j.draw(pd, 1, arrow=1, rat=0.4, mul=0.3, col=(127, 255, 255))
+            #j.draw(pd, 1, arrow=1, rat=0.4, mul=0.3, col=(127, 255, 255))
+            pass
 
     pd.upd()
-    pd.fill()
+    #pd.fill()

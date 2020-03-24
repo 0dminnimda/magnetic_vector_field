@@ -30,8 +30,8 @@ def Bvec(i, j, pt):
 def trans(ob, i, j, pt):
     a = Bvec(i, j, (pt[0], pt[1]-120))
     b = Bvec(i, j, (pt[0], pt[1]+120))
-    #set_ang(ob, a.ang()-pi)
-    set_ang(ob, (a.ang() + b.ang()))
+    rotate(a, pi)
+    set_ang(ob, (a+b).ang())
     # set_mag(ob, Bv.mag()*10**6.25)
 
 

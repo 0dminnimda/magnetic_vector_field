@@ -6,6 +6,7 @@ from pygame_draw import pyg_draw, mou_pos
 from time import time as ti
 from vector import *
 
+vec = Vector
 
 def prop(max1, max2, val1):
     val2 = max2*val1/max1
@@ -64,6 +65,11 @@ def B_poles(i, j, pt):
     r1 = [p, pt1]
     r2 = [p, pt2]
 
+    rv = vec(r)
+    r1v = vec(r)
+    r2v = vec(r)
+    print()
+
     l = [pt1, pt2]
     lx = [(pt1[0], pt2[1]), pt2]
     ly = [(pt1[0], pt2[1]), pt1]
@@ -96,7 +102,12 @@ def B_poles(i, j, pt):
     pd.line(*y1, col="red", wid=5)
     pd.line(*y2, col="red", wid=5)
 
+    #B = pole(r1, r2, x1, x2, y1, y2)
+
     return Vector(0, 0)
+
+def to_pt(l):
+    return *l[0], *l[1]
 
 def diopole(theta, phi, r, mu=1):
     xh = np.array([1, 0, 0])
@@ -106,10 +117,12 @@ def diopole(theta, phi, r, mu=1):
            + (cos(theta)**2 - 1/3)*zh)
     return 3*mu/r**3 * vec
 
-def pole(r, mu=1):
+def pole(r1, r2, x1, x2, y1, y2):
     xh = np.array([1, 0, 0])
     yh = np.array([0, 1, 0])
-    #vec = (Baxis()*xh + Baxis()*yh)
+    vec = (Baxis(r1, r2, x1, x2)*xh
+           + Baxis(r1, r2, y1, y2)*yh)
+    return vec
 
 def Baxis(r1, r2, dist1, dist2, b1=1, b2=-1):
     return (b1*dist1/r1**3

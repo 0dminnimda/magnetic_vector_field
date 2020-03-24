@@ -3,7 +3,31 @@ from numpy import linalg as lrg
 from math import sin, cos, pi, tau, atan2
 
 class Vector:
-    def __init__(self, x, y, x1=0, y1=0):
+    def __init__(self, *args, **kwargs):
+        x1=0
+        y1=0
+
+        if len(args) == 4:
+            x, y, x1, y1 = args
+
+        elif len(args) == 2:
+            if isinstance(args[0], (int, float)):
+                x = args[0]
+                if isinstance(args[1], (int, float)):
+                    y = args[1]
+                else:
+                    raise Exception("не оба компонента числа или массивы")
+            else:
+                if isinstance(args[1], (int, float)):
+                    raise Exception("не оба компонента числа или массивы")
+                else:
+                    x, y = args[0]
+                    x1, y1 = args[1]
+
+        elif len(args) == 1:
+            x, y = args[0][0]
+            x1, y1 = args[0][1]
+
         self.pos = np.array([x1, y1], dtype=float)
         self.vec = np.array([x, y], dtype=float)
         self._mag = self.mag()
@@ -111,6 +135,9 @@ class Vector:
         return self.pos+p1, self.pos+p2, self.end_pos()
 
 for _ in [1]:
+    def isiterable(obj):
+        return hasattr(obj, '__contains__')
+
     def vec_sum(arr):
         sum = Vector(0, 0)
         for i in arr:

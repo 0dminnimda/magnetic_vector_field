@@ -111,6 +111,12 @@ class Vector:
         return self.pos+p1, self.pos+p2, self.end_pos()
 
 for _ in [1]:
+    def vec_sum(arr):
+        sum = Vector(0, 0)
+        for i in arr:
+            sum += i
+        return sum
+
     def set_vec(obj, vec):
         obj.vec = np.array(vec)
         return obj

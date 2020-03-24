@@ -11,28 +11,45 @@ def prop(max1, max2, val1):
     val2 = max2*val1/max1
     return val2
 
-def pt_rot(arr, pt, func):
+def pt_rot(arr, pts, func):
     global cols, rows
     a=0
     for obb, i in zip(arr, rows):
         for ob, j in zip(obb, cols):
             a += 1
-            func(ob, i, j, pt)
+            func(ob, i, j, pts)
 
-def trans(ob, i, j, pt):
-    a = Bvec(i, j, (pt[0], pt[1]-1))
-    b = Bvec(i, j, (pt[0], pt[1]+1))
-    rotate(a, pi)
-    set_ang(ob, (a+b*1).ang())
-    # set_mag(ob, Bv.mag()*10**6.25)
+def trans(ob, i, j, pts):
+    vcs = [B_diopole(i, j, pt) for pt in pts]
+    vcs[0].rotate(pi)
+    bv = vec_sum(vcs)
+    set_ang(ob, bv.ang())
+    #set_mag(ob, bv.mag()*10**6.25)
 
-def Bvec(i, j, pt):
+def trans2(ob, i, j, pts):
+    bv = Bvec(i, j, pts)
+    #bv = vec_sum(vcs)
+    set_ang(ob, bv.ang())
+    #set_mag(ob, bv.mag()*10**6.25)
+
+def B_poles(i, j, pt):
     v = Vector(i-pt[1], j-pt[0])
     r = v.mag()
     theta = angy(v)
     phi = 0
     B = diopole(theta, phi, r) 
     return Vector(B[0], B[-1])
+
+def B_diopole(i, j, pt):
+    v = Vector(i-pt[1], j-pt[0])
+    r = v.mag()
+    theta = angy(v)
+    phi = 0
+    B = diopole(theta, phi, r) 
+    return Vector(B[0], B[-1])
+
+def Baxis(theta, r, mu=1):
+    return mu*(3*cos(theta)**2 - 1) / r**3
 
 def diopole(theta, phi, r, mu=1):
     xh = np.array([1, 0, 0])
@@ -41,6 +58,11 @@ def diopole(theta, phi, r, mu=1):
     vec = (sin(theta)*cos(theta)*(cos(phi)*xh + sin(phi)*yh)
            + (cos(theta)**2 - 1/3)*zh)
     return 3*mu/r**3 * vec
+
+def pole(theta, phi, r, mu=1):
+    xh = np.array([1, 0, 0])
+    yh = np.array([0, 1, 0])
+    vec = (Baxis()*xh + Baxis()*yh)
 
 pd = pyg_draw(0.75)
 w, h = pd.cen()
@@ -65,7 +87,9 @@ for i in range(len(rows)):
 
 #pt_rot(arr)
 
-pt_rot(arr, (w, h), trans)
+pts = [(w-100, h-100), (w+100, h+100)]
+
+pt_rot(arr, pts, trans)
 
 #arr = [mul(norm(set_ang(Vector(*rd(2), w, h), rd())), 50) for i in range(30)]
 

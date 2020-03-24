@@ -30,7 +30,7 @@ def Bvec(i, j, pt):
     v = Vector(i-pt[1], j-pt[0])
     r = v.mag()
     theta = angy(v)
-    phi = pi*0.45
+    phi = 0
     B = diopole(theta, phi, r) 
     return Vector(B[0], B[-1])
 
